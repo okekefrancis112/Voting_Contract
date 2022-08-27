@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.13;
+pragma solidity ^0.8.16;
 
 contract Voting {
 
@@ -86,15 +86,14 @@ contract Voting {
     event ProposalRegisteredEvent(uint proposalId);
     event VotingSessionStartedEvent ();
     event VotingSessionEndedEvent ();
-    event VotedEvent (address voter, uint proposalId);
-    event VotesTalliedEvent ();
+    event VotedEvent(address voter, uint proposalId);
+    event VotesTalliedEvent();
 
     event WorkflowStatusChangeEvent (WorkflowStatus previousStatus, WorkflowStatus newStatus);
 
     function registerVoter(address _voterAddress) public onlyAdministrator onlyDuringVotersRegistration {
         
-        require(!voters[_voterAddress].isRegistered, 
-        "the voter is already registered");
+        require(!voters[_voterAddress].isRegistered, "the voter is already registered");
             
         voters[_voterAddress].isRegistered = true;
         voters[_voterAddress].hasVoted = false;
@@ -104,19 +103,18 @@ contract Voting {
     }
 
     function startProposalsRegistration() public onlyAdministrator onlyDuringVotersRegistration {
-        workflowStatus = WorkflowStatus. ProposalsRegistrationStarted;
+
+        workflowStatus = WorkflowStatus.ProposalsRegistrationStarted;
             
         emit ProposalsRegistrationStartedEvent();
-        emit WorkflowStatusChangeEvent(
-        WorkflowStatus. RegisteringVoters, workflowStatus);
+        emit WorkflowStatusChangeEvent(WorkflowStatus.RegisteringVoters, workflowStatus);
     }
     
     function endProposalsRegistration() public onlyAdministrator onlyDuringProposalsRegistration {
         workflowStatus = WorkflowStatus.ProposalsRegistrationEnded;
 
         emit ProposalsRegistrationEndedEvent();        
-        emit WorkflowStatusChangeEvent(
-        WorkflowStatus.ProposalsRegistrationStarted, workflowStatus);
+        emit WorkflowStatusChangeEvent(WorkflowStatus.ProposalsRegistrationStarted, workflowStatus);
     }
 
     function registerProposal(string memory proposalDescription) public onlyRegisteredVoter onlyDuringProposalsRegistration {
@@ -124,7 +122,6 @@ contract Voting {
                 description: proposalDescription,
                 voteCount: 0
         }));
-
         emit ProposalRegisteredEvent(proposals.length - 1);
     }
 
@@ -135,7 +132,6 @@ contract Voting {
         voters[msg.sender].votedProposalId = proposalId;
             
         proposals[proposalId].voteCount += 1;
-
         emit VotedEvent(msg.sender, proposalId);
     }
 
@@ -147,13 +143,12 @@ contract Voting {
             winningVoteCount = proposals[i].voteCount;
             winningProposalIndex = i;
             }
-        }
-            
+        }            
         winningProposalId = winningProposalIndex;
         workflowStatus = WorkflowStatus.VotesTallied;
 
         emit VotesTalliedEvent();
-        emit WorkflowStatusChangeEvent(WorkflowStatus. VotingSessionEnded, workflowStatus);
+        emit WorkflowStatusChangeEvent(WorkflowStatus.VotingSessionEnded, workflowStatus);
     }
 
     function getProposalsNumber() public view returns (uint) {
